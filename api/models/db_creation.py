@@ -1,12 +1,11 @@
 from api import db
-from sqlalchemy.dialects import postgresql
 
 
 class Pessoas(db.Model):
     id_pessoa = db.Column(db.Integer, primary_key=True)
-    nome = db.Column(db.String(255))
-    cpf = db.Column(db.String(255), unique=True)
-    data_nascimento = db.Column(db.Date)  # falta definir formato a DDDMMYYYY
+    nome = db.Column(db.String(255), nullable=False)
+    cpf = db.Column(db.String(255), unique=True, nullable=False)
+    data_nascimento = db.Column(db.Date)
 
     def __init__(self, nome, cpf, data_nascimento):
         self.nome = nome
@@ -18,11 +17,12 @@ class Pessoas(db.Model):
 class Contas(db.Model):
     id_conta = db.Column(db.Integer, primary_key=True)
     id_pessoa = db.Column(db.Integer, db.ForeignKey('pessoas.id_pessoa'), nullable=False)
-    saldo = db.Column(postgresql.MONEY)  # monetario - limitar negativo ? deposito negativo
-    limite_saque_diario = db.Column(db.Numeric)  # monetario - limitar negativo ?
-    flag_ativo = db.Column(db.Boolean)  # condicional
-    tipo_conta = db.Column(db.Integer)
-    data_criacao = db.Column(db.Date)  # formato
+    saldo = db.Column(db.Float(precision=2), nullable=False)  # monetario - limitar negativo ? deposito negativo
+    limite_saque_diario = db.Column(db.Float(precision=2))  # monetario - limitar negativo ?
+    flag_ativo = db.Column(db.Boolean, default=True)
+    tipo_conta = db.Column(db.Integer, nullable=False)
+    data_criacao = db.Column(db.DateTime)
+    # ALTER TABLE public.pessoas ADD data_criacao timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP;
 
     def __init__(self, id_conta, saldo, limite_saque_diario, flag_ativo, tipo_conta, data_criacao):
         self.id_conta = id_conta
@@ -37,8 +37,8 @@ class Contas(db.Model):
 class Transacoes(db.Model):
     id_transacao = db.Column(db.Integer, primary_key=True)
     id_conta = db.Column(db.Integer, db.ForeignKey('contas.id_conta'), nullable=False)
-    valor = db.Column(postgresql.MONEY)  # monetario
-    data_transacao = db.Column(db.Date)
+    valor = db.Column(db.Float(precision=2), nullable=False)
+    data_transacao = db.Column(db.DateTime, nullable=False)
 
     def __init__(self, id_transacao, id_conta, valor, data_transacao):
         self.id_transacao = id_transacao
