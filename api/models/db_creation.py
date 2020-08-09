@@ -17,7 +17,7 @@ class Pessoas(db.Model):
 
 class Contas(db.Model):
     id_conta = db.Column(db.Integer, primary_key=True)
-    id_pessoa = db.Column(db.Integer, foreign_key=Pessoas.id_pessoa, nullable=False)
+    id_pessoa = db.Column(db.Integer, db.ForeignKey('pessoas.id_pessoa'), nullable=False)
     saldo = db.Column(postgresql.MONEY)  # monetario - limitar negativo ? deposito negativo
     limite_saque_diario = db.Column(db.Numeric)  # monetario - limitar negativo ?
     flag_ativo = db.Column(db.Boolean)  # condicional
@@ -32,3 +32,16 @@ class Contas(db.Model):
         self.tipo_conta = tipo_conta
         self.data_criacao = data_criacao
 # creamos el __repr__ ?
+
+
+class Transacoes(db.Model):
+    id_transacao = db.Column(db.Integer, primary_key=True)
+    id_conta = db.Column(db.Integer, db.ForeignKey('contas.id_conta'), nullable=False)
+    valor = db.Column(postgresql.MONEY)  # monetario
+    data_transacao = db.Column(db.Date)
+
+    def __init__(self, id_transacao, id_conta, valor, data_transacao):
+        self.id_transacao = id_transacao
+        self.id_conta = id_conta
+        self.valor = valor
+        self.data_transacao = data_transacao
