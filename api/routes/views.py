@@ -37,21 +37,19 @@ def get_pessoa(id):
 
 @app.route('/contas/new', methods=['POST'])
 def new_conta():
-    if request.method == 'POST':
-        id_conta = request.json['idConta']
-        id_pessoa = request.json['idPessoa']
-        saldo = request.json['saldo']
-        limite_saque_diario = request.json['limiteSaqueDiario']
-        flag_ativo = request.json['flagAtivo']
-        tipo_conta = request.json['tipoConta']
-        data_criacao = request.json['dataCriacao']
+    id_pessoa = request.json['idPessoa']
+    saldo = request.json['saldo']
+    limite_saque_diario = request.json['limiteSaqueDiario']
+    flag_ativo = request.json['flagAtivo']
+    tipo_conta = request.json['tipoConta']
+    data_criacao = request.json['dataCriacao']
 
-        conta = Contas(id_conta, id_pessoa, saldo, limite_saque_diario, flag_ativo, tipo_conta, data_criacao)
-        db.session.add(conta)
-        db.session.commit()
+    conta = Contas(id_pessoa, saldo, limite_saque_diario, flag_ativo, tipo_conta, data_criacao)
+    db.session.add(conta)
+    db.session.commit()
 
-        if conta:
-            return "200"
+    if conta:
+        return "200"
 
 
 @app.route('/contas/<id>', methods=['GET'])
@@ -66,18 +64,17 @@ def get_saldo(id):
 
 @app.route('/transacao/deposito', methods=['POST'])
 def deposito():
-    if request.method == 'POST':
-        id_transacao = request.json['idTransacao']
-        id_conta = request.json['idConta']
-        valor = request.json['valor']
-        data_transacao = request.json['dataTransacao']
+    id_transacao = request.json['idTransacao']
+    id_conta = request.json['idConta']
+    valor = request.json['valor']
+    data_transacao = request.json['dataTransacao']
 
-        transacao = Transacoes(id_transacao, id_conta, valor, data_transacao)
-        db.session.add(transacao)
-        db.session.commit()
+    transacao = Transacoes(id_transacao, id_conta, valor, data_transacao)
+    db.session.add(transacao)
+    db.session.commit()
 
-        if transacao:
-            return "200"
+    if transacao:
+        return "200"
 
 
 @app.route('/transacao/<id>', methods=['GET'])

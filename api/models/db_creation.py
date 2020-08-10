@@ -21,10 +21,8 @@ class Contas(db.Model):
     flag_ativo = db.Column(db.Boolean, default=True)
     tipo_conta = db.Column(db.Integer, nullable=False)
     data_criacao = db.Column(db.DateTime)
-    # ALTER TABLE public.pessoas ADD data_criacao timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP;
 
-    def __init__(self, id_conta, id_pessoa, saldo, limite_saque_diario, flag_ativo, tipo_conta, data_criacao):
-        self.id_conta = id_conta
+    def __init__(self, id_pessoa, saldo, limite_saque_diario, flag_ativo, tipo_conta, data_criacao):
         self.id_pessoa = id_pessoa
         self.saldo = saldo
         self.limite_saque_diario = limite_saque_diario
@@ -35,8 +33,7 @@ class Contas(db.Model):
 
 class ContasSchema(ma.Schema):
     class Meta:
-        fields = ('id_conta', 'id_pessoa', 'saldo', 'limite_saque_diario', 'flag_ativo', 'tipo_conta', 'data_criacao')
-
+        fields = ('id_pessoa', 'saldo', 'limite_saque_diario', 'flag_ativo', 'tipo_conta', 'data_criacao')
 
 conta_schema = ContasSchema()
 
