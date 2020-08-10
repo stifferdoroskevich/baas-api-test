@@ -1,17 +1,17 @@
-from api import db
+from api import db, ma
 
 
 class Pessoas(db.Model):
     id_pessoa = db.Column(db.Integer, primary_key=True)
-    nome = db.Column(db.String(255), nullable=False)
-    cpf = db.Column(db.String(255), unique=True, nullable=False)
+    nome = db.Column(db.String(70), nullable=False)
+    cpf = db.Column(db.String(30), unique=True, nullable=False)
     data_nascimento = db.Column(db.Date)
 
     def __init__(self, nome, cpf, data_nascimento):
         self.nome = nome
         self.cpf = cpf
         self.data_nascimento = data_nascimento
-# creamos el __repr__ ?
+
 
 
 class Contas(db.Model):
@@ -24,14 +24,22 @@ class Contas(db.Model):
     data_criacao = db.Column(db.DateTime)
     # ALTER TABLE public.pessoas ADD data_criacao timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP;
 
-    def __init__(self, id_conta, saldo, limite_saque_diario, flag_ativo, tipo_conta, data_criacao):
+    def __init__(self, id_conta, id_pessoa, saldo, limite_saque_diario, flag_ativo, tipo_conta, data_criacao):
         self.id_conta = id_conta
+        self.id_pessoa = id_pessoa
         self.saldo = saldo
         self.limite_saque_diario = limite_saque_diario
         self.flag_ativo = flag_ativo
         self.tipo_conta = tipo_conta
         self.data_criacao = data_criacao
-# creamos el __repr__ ?
+
+
+class ContasSchema(ma.Schema):
+    class Meta:
+        fields = ('id_conta', 'id_pessoa', 'saldo', 'limite_saque_diario', 'flag_ativo', 'tipo_conta', 'data_criacao')
+
+
+conta_schema = ContasSchema()
 
 
 class Transacoes(db.Model):
