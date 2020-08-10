@@ -13,7 +13,6 @@ class Pessoas(db.Model):
         self.data_nascimento = data_nascimento
 
 
-
 class Contas(db.Model):
     id_conta = db.Column(db.Integer, primary_key=True)
     id_pessoa = db.Column(db.Integer, db.ForeignKey('pessoas.id_pessoa'), nullable=False)
@@ -53,3 +52,11 @@ class Transacoes(db.Model):
         self.id_conta = id_conta
         self.valor = valor
         self.data_transacao = data_transacao
+
+
+class TransacoesSchema(ma.Schema):
+    class Meta:
+        fields = ('id_transacao', 'id_conta', 'valor', 'data_transacao')
+
+
+transacao_schema = TransacoesSchema()
