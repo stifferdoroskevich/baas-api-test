@@ -42,9 +42,8 @@ def new_conta():
     limite_saque_diario = request.json['limiteSaqueDiario']
     flag_ativo = request.json['flagAtivo']
     tipo_conta = request.json['tipoConta']
-    data_criacao = request.json['dataCriacao']
 
-    conta = Contas(id_pessoa, saldo, limite_saque_diario, flag_ativo, tipo_conta, data_criacao)
+    conta = Contas(id_pessoa, saldo, limite_saque_diario, flag_ativo, tipo_conta)
     db.session.add(conta)
     db.session.commit()
 
@@ -64,12 +63,10 @@ def get_saldo(id):
 
 @app.route('/transacao/deposito', methods=['POST'])
 def deposito():
-    id_transacao = request.json['idTransacao']
     id_conta = request.json['idConta']
     valor = request.json['valor']
-    data_transacao = request.json['dataTransacao']
 
-    transacao = Transacoes(id_transacao, id_conta, valor, data_transacao)
+    transacao = Transacoes(id_conta, valor)
     db.session.add(transacao)
     db.session.commit()
 
