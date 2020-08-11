@@ -1,6 +1,6 @@
 from api import app, db
 from flask import request, jsonify
-from api.models.db_creation import Pessoas, Contas, Transacoes
+from api.models.db_creation import Contas, Transacoes
 
 
 @app.route('/contas', methods=['POST'])
