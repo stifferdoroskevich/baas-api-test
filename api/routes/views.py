@@ -3,6 +3,11 @@ from flask import request, jsonify
 from api.models.db_creation import Contas, Transacoes
 
 
+@app.route('/')
+def home():
+    return "Welcome to DOCK!"
+
+
 @app.route('/contas', methods=['POST'])
 def new_conta():
     id_pessoa = request.json['idPessoa']
