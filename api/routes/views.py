@@ -75,7 +75,12 @@ def saque():
 
 @app.route('/transacao/<id>', methods=['GET'])
 def get_extrato_conta(id):
-    extratos = Transacoes.query.filter(Transacoes.id_conta == id)
+    data_inicial = request.json['dataInicial']
+    data_final = request.json['dataFinal']
+    extratos = Transacoes.query.filter(
+        Transacoes.id_conta == id,
+        Transacoes.data_transacao <= data_final,
+        Transacoes.data_transacao >= data_inicial)
     resumo_extrato = {}
     for extrato in extratos:
         resumo_extrato[extrato.id_transacao] = {extrato.id_conta: {

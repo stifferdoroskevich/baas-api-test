@@ -21,7 +21,7 @@ class Contas(db.Model):
     limite_saque_diario = db.Column(db.Float(precision=2))  # monetario - limitar negativo ?
     flag_ativo = db.Column(db.Boolean, default=True)
     tipo_conta = db.Column(db.Integer, nullable=False)
-    data_criacao = db.Column(db.DateTime(timezone=True),  server_default=sqlalchemy.sql.func.now())
+    data_criacao = db.Column(db.DateTime,  server_default=sqlalchemy.sql.func.now())
 
     def __init__(self, id_pessoa, saldo, limite_saque_diario, flag_ativo, tipo_conta):
         self.id_pessoa = id_pessoa
@@ -43,7 +43,7 @@ class Transacoes(db.Model):
     id_transacao = db.Column(db.Integer, primary_key=True)
     id_conta = db.Column(db.Integer, db.ForeignKey('contas.id_conta'), nullable=False)
     valor = db.Column(db.Float(precision=2), nullable=False)
-    data_transacao = db.Column(db.DateTime(timezone=True),  server_default=sqlalchemy.sql.func.now())
+    data_transacao = db.Column(db.DateTime,  server_default=sqlalchemy.sql.func.now())
 
     def __init__(self, id_conta, valor):
         self.id_conta = id_conta
