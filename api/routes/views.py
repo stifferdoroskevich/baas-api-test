@@ -3,39 +3,7 @@ from flask import request, jsonify
 from api.models.db_creation import Pessoas, Contas, Transacoes
 
 
-@app.route('/')
-def start():
-    return "Welcome to Dock"
-
-
-@app.route('/pessoas', methods=['GET'])
-def get_pessoas():
-    pessoas = Pessoas.query.all()
-    dados_pessoas = {}
-    for pessoa in pessoas:
-        dados_pessoas[pessoa.id_pessoa] = {
-            'idPessoa': pessoa.id_pessoa,
-            'nome': pessoa.nome,
-            'cpf': pessoa.cpf,
-            'dataNascimento': pessoa.data_nascimento
-        }
-    return jsonify(dados_pessoas)
-
-
-@app.route('/pessoas/<id>', methods=['GET'])
-def get_pessoa(id):
-    pessoa = Pessoas.query.get(id)
-    if pessoa:
-        dados_pessoa = {id: {
-            'idPessoa': pessoa.id_pessoa,
-            'nome': pessoa.nome,
-            'cpf': pessoa.cpf,
-            'dataNascimento': pessoa.data_nascimento
-        }}
-    return jsonify(dados_pessoa)
-
-
-@app.route('/contas/new', methods=['POST'])
+@app.route('/contas', methods=['POST'])
 def new_conta():
     id_pessoa = request.json['idPessoa']
     saldo = request.json['saldo']
@@ -61,13 +29,44 @@ def get_saldo(id):
     return jsonify(valor_saldo)
 
 
+@app.route('/contas/<id>/inativar', methods=['PUT'])
+def inativar_conta(id):
+    conta = Contas.query.get(id)
+    conta.flag_ativo = False
+    db.session.commit()
+
+    return "Conta Inativada!"
+
+
 @app.route('/transacao/deposito', methods=['POST'])
 def deposito():
     id_conta = request.json['idConta']
     valor = request.json['valor']
 
     transacao = Transacoes(id_conta, valor)
-    db.session.add(transacao)
+    conta = Contas.query.get(id_conta)
+    conta.saldo = conta.saldo + valor
+    db.session.add(transacao, conta)
+    db.session.commit()
+
+    if transacao:
+        return "200"
+
+
+@app.route('/transacao/saque', methods=['POST'])
+def saque():
+    id_conta = request.json['idConta']
+    valor = request.json['valor']
+    conta = Contas.query.get(id_conta)
+
+    if valor > conta.saldo:
+        return "Saldo Insuficiente"
+    if valor > conta.limite_saque_diario:
+        return "valor superior ao limite diario"
+
+    conta.saldo = conta.saldo - valor
+    transacao = Transacoes(id_conta, -valor)
+    db.session.add(transacao, conta)
     db.session.commit()
 
     if transacao:

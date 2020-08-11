@@ -30,9 +30,6 @@ class Contas(db.Model):
         self.flag_ativo = flag_ativo
         self.tipo_conta = tipo_conta
 
-    def atualizar_saldo(self):
-        print("Saldo Atualizado!")
-
 
 class ContasSchema(ma.Schema):
     class Meta:
