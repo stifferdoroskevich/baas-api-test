@@ -1,6 +1,6 @@
 from api import app, db
 from flask import request, jsonify
-from api.models.db_creation import Contas, Transacoes
+from api.models.db_creation import Contas, Transacoes, Pessoas
 
 
 @app.route('/')
@@ -8,20 +8,57 @@ def home():
     return "Welcome to DOCK!"
 
 
+@app.route('/pessoas', methods=['GET'])
+def get_pessoas():
+    pessoas = Pessoas.query.all()
+    dados_pessoas = {}
+    for pessoa in pessoas:
+        dados_pessoas[pessoa.id_pessoa] = {
+            'idPessoa': pessoa.id_pessoa,
+            'nome': pessoa.nome,
+            'cpf': pessoa.cpf,
+            'dataNascimento': pessoa.data_nascimento
+        }
+    return jsonify(dados_pessoas)
+
+
+@app.route('/pessoas/<id>', methods=['GET'])
+def get_pessoa(id):
+    pessoa = Pessoas.query.get(id)
+    if pessoa:
+        dados_pessoa = {id: {
+            'idPessoa': pessoa.id_pessoa,
+            'nome': pessoa.nome,
+            'cpf': pessoa.cpf,
+            'dataNascimento': pessoa.data_nascimento
+        }}
+    return jsonify(dados_pessoa)
+
+
 @app.route('/contas', methods=['POST'])
 def new_conta():
-    id_pessoa = request.json['idPessoa']
-    saldo = request.json['saldo']
-    limite_saque_diario = request.json['limiteSaqueDiario']
-    flag_ativo = request.json['flagAtivo']
-    tipo_conta = request.json['tipoConta']
+    try:
+        id_pessoa = int(request.json['idPessoa'])
+        saldo = int(request.json['saldo'])
+        limite_saque_diario = int(request.json['limiteSaqueDiario'])
+        flag_ativo = bool(request.json['flagAtivo'])
+        tipo_conta = int(request.json['tipoConta'])
+    except Exception as e:
+        return jsonify({"message": "Parametros invalidos. Favor a siga a documentacao: https://bit.ly/documentacao_dock"}), 403
 
-    conta = Contas(id_pessoa, saldo, limite_saque_diario, flag_ativo, tipo_conta)
-    db.session.add(conta)
-    db.session.commit()
-
+    # Validar limiteSaqueDiario e saldo e tipoConta
+    if limite_saque_diario < 0 or tipo_conta not in [0, 1]:
+        return jsonify({"message": "Limite de saque diario nao deve ser negativo. Tipo de conta deve ser 0 - Conta Corrente, 1 - Conta Poupança."}), 403
+    # Validar se a pessoa existe
+    pessoa = Pessoas.query.get(id_pessoa)
+    if pessoa:
+        conta = Contas(id_pessoa, saldo, limite_saque_diario, flag_ativo, tipo_conta)
+        db.session.add(conta)
+        db.session.commit()
+    else:
+        return jsonify({"message": "pessoa invalida"}), 403
     if conta:
-        return "200"
+        return jsonify({"message": {"idConta": conta.id_conta}}), 200
 
 
 @app.route('/contas/<id>', methods=['GET'])
@@ -80,12 +117,18 @@ def saque():
 
 @app.route('/transacao/<id>', methods=['GET'])
 def get_extrato_conta(id):
-    data_inicial = request.json['dataInicial']
-    data_final = request.json['dataFinal']
-    extratos = Transacoes.query.filter(
-        Transacoes.id_conta == id,
-        Transacoes.data_transacao <= data_final,
-        Transacoes.data_transacao >= data_inicial)
+    filter_list = [Transacoes.id_conta == id]
+    if request.json:
+        try:
+            data_inicial = request.json['dataInicial']
+            data_final = request.json['dataFinal']
+            filter_list.extend([Transacoes.data_transacao >= data_inicial, Transacoes.data_transacao <= data_final])
+        except Exception as e:
+            return jsonify(
+                {"message": "Parametros invalidos. Favor a siga a documentacao: https://bit.ly/documentacao_dock"}), 403
+
+    extratos = Transacoes.query.filter(*filter_list)
+
     resumo_extrato = {}
     for extrato in extratos:
         resumo_extrato[extrato.id_transacao] = {extrato.id_conta: {
