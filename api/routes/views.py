@@ -101,7 +101,6 @@ def inativar_conta(id):
     return jsonify({'message': "Conta {} inativada".format(id)})
 
 
-
 @app.route('/transacao/deposito', methods=['POST'])
 def deposito():
     if not request.json:
