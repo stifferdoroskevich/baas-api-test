@@ -5,7 +5,7 @@ docker pull postgres:12
 docker run -d -p 5444:5432 --name dbdock -e POSTGRES_PASSWORD=dockdock -d postgres:12
 
 SECOND
-git clone https://github.com/stifferdoroskevich/desafio-dev-api-rest.git
+git clone https://github.com/stifferdoroskevich/baas-api-test.git
 cd desafio-dev-api-rest
 python3 -m venv venv
 source venv/bin/activate
